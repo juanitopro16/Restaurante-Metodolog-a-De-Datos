@@ -1,0 +1,17 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Base de datos SQLite local (cada integrante genera la suya)
+*.db
+restaurante.db
+
+# Entornos virtuales
+env/
+venv/
+.env
+
+# Configuraciones del editor
+.vscode/
+.idea/
