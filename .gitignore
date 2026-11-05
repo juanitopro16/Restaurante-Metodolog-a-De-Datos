@@ -1,0 +1,8 @@
+restaurante.db
+restaurante.db-journal
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.vscode/
+.idea/
