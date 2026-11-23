@@ -1,0 +1,63 @@
+CAMBIOS - PATRICIO COSAÍN TORRES · SPRINT 4
+Tareas: T56, T57, T58, T63          Matrícula: 07022143
+Hecho con apoyo de IA; el código fue revisado y lo puedo explicar.
+
+ARCHIVOS ENTREGADOS
+1. estilos_sprint4.py  (NUEVO)      -> T63
+2. pato_pantallas.py   (MODIFICADO) -> T56, T57, T58
+NO se modificó: pato_almacen.py, base_datos.py, main.py, restaurante.db ni archivos de compañeros.
+
+CÓMO INTEGRAR
+- Copiar los dos archivos a la carpeta raíz del proyecto (donde está main.py).
+- Reemplazar solo pato_pantallas.py. main.py no cambia: sigue llamando a mostrar_almacen_pato(self).
+- No se instala nada (solo Tkinter).
+
+------------------------------------------------------------
+T63 · Estilos y componentes compartidos
+- Archivo único con colores, fuentes, márgenes y colores por estado.
+- Helpers: aplicar_estilos, crear_titulo, crear_etiqueta, crear_boton,
+  crear_panel, crear_insignia, crear_tabla, configurar_tags_estado,
+  tag_estado, color_estado, nivel_stock.
+- Uso para compañeros:
+      import estilos_sprint4 as est
+      est.aplicar_estilos(self.ventana)
+      est.crear_boton(frame, "Guardar", funcion, "exito").pack()
+- Prueba aislada: py estilos_sprint4.py (no usa la base de datos).
+
+T56 · Rediseño de la pantalla de inventario  (mostrar_almacen_pato)
+- Resumen arriba (insumos, en mínimo, bajo mínimo), tabla con columna Estado
+  y barra de desplazamiento, botones en una sola fila, alertas en tarjeta aparte.
+- Se conservan TODAS las acciones: registrar salida, historial, actualizar,
+  órdenes de compra, volver al menú, y app.refrescar_existencias (Said T38 / Aarón T44).
+- Historial: entradas en verde, salidas en naranja.
+
+T57 · Alertas visuales de existencias bajas
+- Fila verde = OK, naranja = en el mínimo, rojo = bajo mínimo; leyenda de colores.
+- Usa est.nivel_stock(): solo LEE existencia y mínimo, no cambia cantidades.
+- La tabla de alertas sigue usando listar_bajo_minimo() (T42): "en mínimo" se
+  muestra pero no cuenta como alerta (criterio de Sprint 3, confirmar con Said).
+
+T58 · Rediseño de órdenes de compra  (mostrar_ordenes_compra)
+- Dos columnas: "Nueva orden" y "Órdenes guardadas".
+- Color por estado: Pendiente naranja, Solicitada azul, Recibida verde.
+- Filtro por estado, columna con número de insumos, contador por estado.
+- NO se cambió la transición Pendiente -> Solicitada -> Recibida ni se suman
+  existencias en esta pantalla (recibir es T44 de Aarón), así no puede sumar dos veces.
+
+------------------------------------------------------------
+PRUEBAS (hacer en Windows con copia de restaurante.db)
+1. py estilos_sprint4.py -> abre ventana de prueba con tabla de colores y botones.
+2. py main.py, entrar como almacén -> abre inventario con colores.
+3. Insumo arriba del mínimo = verde; igual al mínimo = naranja; abajo = rojo y aparece en alertas.
+4. Registrar salida de prueba -> la existencia baja y la tabla se refresca sin duplicados.
+5. Entrar como mesero -> sigue saliendo "Acceso denegado".
+6. Crear orden -> aparece como Pendiente (naranja). Filtro "Recibida" solo muestra recibidas.
+7. Correr py prueba_pato_t39_t40_t42_t43.py -> debe pasar igual que antes.
+
+RIESGOS / PENDIENTES
+- Revisado con una prueba automática de las pantallas (sin ventana real); falta
+  confirmación visual en Windows y capturas antes/después.
+- aplicar_estilos usa el tema ttk "clam", que aplica a toda la app al abrir almacén:
+  las tablas de compañeros pueden verse con el mismo estilo (no cambia su funcionamiento).
+- No tuve sprint3_pantallas.py (mostrar_insumos_said / mostrar_compras_aaron);
+  no se tocaron.

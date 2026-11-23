@@ -1,0 +1,141 @@
+CAMBIOS_AARON.txt
+SPRINT 4 - GUÍA DE INTEGRACIÓN DEL MÓDULO DE AARÓN
+T48, T59, T60, T61
+
+IMPORTANTE: Este documento fue reconstruido a partir de aaron_sprint4.py y de
+main.py del proyecto Sprint 3 disponible. NO es un archivo original enviado
+por Aarón. Si main.py ya fue modificado durante Sprint 4, adaptar los cambios
+manualmente; NO reemplazarlo por la versión antigua.
+
+1. ARCHIVOS NECESARIOS
+- aaron_sprint4.py (módulo de Aarón)
+- prueba_aaron_sprint4.py (pruebas automáticas)
+- base_datos.py, sprint3_nuevo.py y javier_caja_proveedores.py (dependencias)
+- main.py (archivo que enlaza las pantallas)
+
+Colocar aaron_sprint4.py en la misma carpeta que main.py. Hacer copia de
+seguridad de main.py y restaurante.db ANTES de cualquier modificación.
+
+2. IMPORTACIONES EN main.py
+Añadir cerca de las importaciones existentes:
+
+from aaron_sprint4 import (
+    formulario_pedido_rediseno,
+    mostrar_cocina_tarjetas,
+    asegurar_columna_envio,
+)
+
+No eliminar importaciones que todavía usen otras pantallas o funciones.
+
+3. INICIALIZACIÓN
+En SistemaRestaurante.__init__, DESPUÉS de inicializar la base de datos,
+llamar una vez a:
+
+    asegurar_columna_envio()
+
+Esto añade pedidos.fecha_hora_envio si no existe. No elimina registros.
+No ejecutar migraciones sobre la base real sin respaldo.
+
+4. CONECTAR LA PANTALLA DE PEDIDOS (T59)
+En la clase SistemaRestaurante, buscar:
+
+    def formulario_agregar_productos(self, pedido_id):
+
+La opción más sencilla es sustituir el CONTENIDO del método por:
+
+    def formulario_agregar_productos(self, pedido_id):
+        return formulario_pedido_rediseno(self, pedido_id)
+
+IMPORTANTE: No mantener el cuerpo viejo después de este return. Si Juan ya
+rediseñó la navegación, conservar su método y cambiar únicamente el punto de
+apertura. El nuevo formulario usa app.ventana, app.sesion y app.mostrar_mesas().
+
+De esta forma, tanto 'Crear pedido' como 'Editar pedido en borrador' siguen
+utilizando la misma ruta del programa, pero abren la pantalla nueva.
+
+5. CONECTAR LA PANTALLA DE COCINA (T60 Y T61)
+En SistemaRestaurante buscar:
+
+    def mostrar_cocina(self):
+
+Sustituir el CONTENIDO del método por:
+
+    def mostrar_cocina(self):
+        return mostrar_cocina_tarjetas(self)
+
+Esto conserva la llamada existente desde ejecutar_opcion cuando la opción es
+'Consultar comandas pendientes'. El módulo de Aarón necesita app.sesion,
+app.limpiar_pantalla(), app.marco, app.volver_menu() y app.ventana.
+
+NOTA: La nueva pantalla muestra estados Pendiente, En preparación y Listo.
+No borrar la pantalla independiente de Sprint 3 para entregas ni sus opciones.
+
+6. HORA DE ENVÍO A COCINA (T61)
+La pantalla nueva llama a enviar_pedido_cocina_t61(pedido_id), que guarda
+estado Pendiente y fecha_hora_envio en la misma actualización SQL.
+
+ATENCIÓN: Si otra pantalla o archivo sigue llamando directamente a
+base_datos.enviar_pedido_cocina(), podría crear comandas sin hora de envío.
+Buscar todas las llamadas a enviar_pedido_cocina( en el proyecto y comprobar
+que el flujo del mesero utilice la función de Aarón. NO reemplazar funciones
+indiscriminadamente: comprobar primero sus argumentos y efectos.
+
+Pedidos anteriores sin hora de envío aparecerán con '—'; esto es esperado.
+El indicador se actualiza cada 30 segundos, mientras la pantalla esté abierta.
+
+7. HISTORIAL (T48)
+Las funciones disponibles para que Said y otros módulos construyan la consulta
+son:
+
+    listar_historial_pedidos(limite=200)
+    obtener_historial_pedido(pedido_id)
+
+No se agrega automáticamente un botón de historial al menú principal.
+Said puede importar estas funciones desde aaron_sprint4.py para T49 y T50.
+La consulta depende de las tablas de pagos de Javier:
+    pagos_javier, pago_pedidos_javier, pago_lineas_javier
+
+Antes de usar el historial, verificar que Javier inicialice sus tablas con
+preparar_tablas_javier() en el arranque del proyecto.
+
+ADVERTENCIA: total_pago es el total de un COBRO, que puede agrupar varios
+pedidos de una mesa. No sumarlo una vez por cada pedido, pues duplicaría
+ventas. Los nombres de productos consultados desde el catálogo podrían
+cambiar si el catálogo se edita; las líneas del pago conservan los importes
+históricos guardados.
+
+8. PRUEBAS SIN TOCAR LA BASE REAL
+Desde la carpeta del proyecto, con todos los módulos necesarios presentes:
+
+    py prueba_aaron_sprint4.py
+
+O, en otros sistemas:
+
+    python prueba_aaron_sprint4.py
+
+El script cambia temporalmente base_datos.NOMBRE_BD y crea una base de prueba.
+Comprobar que termina con 'Todas las pruebas de Aarón pasaron.'.
+Después, probar MANUALMENTE en la interfaz:
+- Entrar como mesero; crear pedido; agregar, editar y quitar productos.
+- Enviar a cocina; comprobar que no se pueda editar el pedido enviado.
+- Entrar como cocina; ver la tarjeta, productos, notas y tiempo.
+- Pasar Pendiente -> En preparación -> Listo.
+- Verificar la entrega desde la pantalla existente de Sprint 3.
+- Cobrar y cerrar mesa; comprobar historial con un pago real de prueba.
+- Comprobar permisos: usuarios de otros roles no deben abrir pantallas ajenas.
+- Comprobar que los demás módulos del sistema sigan abriendo.
+
+9. PROBLEMAS A REVISAR ANTES DE DECLARAR LA INTEGRACIÓN COMPLETA
+- El rediseño de Aarón usa Tkinter/ttk clásico, no CustomTkinter.
+- No hay botón de historial integrado por defecto: corresponde a T49/T50.
+- El menú principal puede haber sido cambiado por Juan; adaptar los enlaces.
+- Si una venta agrupa varios pedidos, el historial debe distinguir total del
+  pago de total por pedido.
+- Hacer pruebas visuales y de integración: las pruebas automáticas verifican
+  sobre todo lógica y datos, no la apariencia ni toda la navegación.
+
+10. ENTREGA Y AUTORÍA
+Entregar aaron_sprint4.py, prueba_aaron_sprint4.py y esta guía reconstruida.
+Mantener el reconocimiento del propio módulo: código creado con ayuda de IA
+y asignado a Aarón. Este archivo de instrucciones fue elaborado posteriormente
+por ChatGPT a petición del equipo, NO escrito ni entregado originalmente por Aarón.
